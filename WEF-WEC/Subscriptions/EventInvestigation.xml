@@ -1,0 +1,204 @@
+<Subscription xmlns="http://schemas.microsoft.com/2006/03/windows/events/subscription">
+  <SubscriptionId>Event-Investigation</SubscriptionId>
+  <SubscriptionType>SourceInitiated</SubscriptionType>
+  <Description>Specific Events collected from all Computers</Description>
+  <Enabled>true</Enabled>
+  <Uri>http://schemas.microsoft.com/wbem/wsman/1/windows/EventLog</Uri>
+  <ConfigurationMode>Custom</ConfigurationMode>
+  <Delivery Mode="Push">
+    <Batching>
+      <MaxItems>5</MaxItems>
+      <MaxLatencyTime>60000</MaxLatencyTime>
+    </Batching>
+    <PushSettings>
+      <Heartbeat Interval="1800000"/>
+    </PushSettings>
+  </Delivery>
+  <Query><![CDATA[
+    <QueryList>
+  <Query Id="0" Path="Security">
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=1100)]]</Select>
+    <!--Event Log Service Shutdown-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=1102)]]</Select>
+    <!--Event Log was Cleared-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4616)]]</Select>
+    <!--System Time Changed-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4624)]]</Select>
+    <!---->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4624)]]</Select>
+    <!---->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4624)]]</Select>
+    <!--Successful User Account Login-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4625)]]</Select>
+    <!---->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4625)]]</Select>
+    <!--Failed User Account Login-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4634)]]</Select>
+    <!---->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4634)]]</Select>
+    <!--Logoff Event-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4648)]]</Select>
+    <!--Account Login with Explicit Credentials-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4657)]]</Select>
+    <!--Registry Modification-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4672)]]</Select>
+    <!--Logon with Special Privs-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4688)]]</Select>
+    <!--Process Created-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4689)]]</Select>
+    <!--Process Terminated-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4704)]]</Select>
+    <!--User Right Assigned-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4706)]]</Select>
+    <!--New Trust for Domain-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4713)]]</Select>
+    <!--Kerberos Policy Changed-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4714)]]</Select>
+    <!--Encrypted Data Recovery Policy Changed-->
+  </Query>
+  <Query Id="1" Path="Security">
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4716)]]</Select>
+    <!--Trusted Domain Information Modified-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4719)]]</Select>
+    <!--System Audit Policy Changed-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4720)]]</Select>
+    <!--New User Account Created-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4722)]]</Select>
+    <!--New User Account Enabled-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4725)]]</Select>
+    <!--User Account Disabled-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4726)]]</Select>
+    <!--User Account Deleted-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4728 or EventID=4732 or EventID=4756)]]</Select>
+    <!--User Added to Privileged Group-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4731)]]</Select>
+    <!--Security-enabled Group Created-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4733)]]</Select>
+    <!--Account removed from Local Sec. Grp.-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4735)]]</Select>
+    <!--Security-Enabled group Modification-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4740)]]</Select>
+    <!--Account Lockouts-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4765)]]</Select>
+    <!--SID History added to Account-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4766)]]</Select>
+    <!--SID History add attempted on Account-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4767)]]</Select>
+    <!--User Account Unlocked-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4769)]]</Select>
+    <!--Kerberos Service Ticket Req. Failed-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4776)]]</Select>
+    <!--Credential Authentication-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4778)]]</Select>
+    <!--TS Session Reconnect-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4779)]]</Select>
+    <!--TS Session Disconnect-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4781)]]</Select>
+    <!--Account Name Changed-->
+  </Query>
+  <Query Id="2" Path="Security">
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4782)]]</Select>
+    <!--Password Hash Accessed-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4793)]]</Select>
+    <!--Password Policy Checking API called-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4870)]]</Select>
+    <!--Certificate Revoked-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4873)]]</Select>
+    <!--Certificate Request Extension Changed-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4874)]]</Select>
+    <!--Certificate Request Attributes Changed-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4880)]]</Select>
+    <!--Certificate Services Started-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4881)]]</Select>
+    <!--Certificate Services Stopped-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4882)]]</Select>
+    <!--Certificate Services Permissions Changed-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4885)]]</Select>
+    <!--Certificate Services Audit Filter Changed-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4886)]]</Select>
+    <!--CA Services Request-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4887)]]</Select>
+    <!--Certificate Services approved request-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4888)]]</Select>
+    <!--Certificate Services denied request-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4890)]]</Select>
+    <!--Certificate Manager Settings Changed-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4891)]]</Select>
+    <!--Certificate Services Configuration Changed-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4892)]]</Select>
+    <!--Certificate Services Property Changed-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4896)]]</Select>
+    <!--Entries Removed from Certificate Database-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4897)]]</Select>
+    <!--Role Separation Enabled-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4898)]]</Select>
+    <!--Certificate Services Loaded Template-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4899)]]</Select>
+    <!--Certificate Services Template Updated-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=4900)]]</Select>
+    <!--Certificate Services Template Security Updated-->
+  </Query>
+  <Query Id="3" Path="Security">
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=5038)]]</Select>
+    <!--Detected an invalid image hash of a file-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=5136)]]</Select>
+    <!--Directory service modified-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=5137)]]</Select>
+    <!--Directory service created-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=5138)]]</Select>
+    <!--Directory service recovered-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=5139)]]</Select>
+    <!--Directory service moved-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=5140)]]</Select>
+    <!--Network share accessed-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=5141)]]</Select>
+    <!--Directory service deleted-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=5142)]]</Select>
+    <!--Network Share Created-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=5144)]]</Select>
+    <!--Network Share Deleted-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=5145)]]</Select>
+    <!--Network Share Checked-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=5376)]]</Select>
+    <!--Credentials backed up-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=5377)]]</Select>
+    <!--Credentials restored-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=5632)]]</Select>
+    <!--Wireless 802.1X Auth-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=6272)]]</Select>
+    <!--Network Policy Server Granted Access-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=6273)]]</Select>
+    <!--Network Policy Server Denied Access-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=6274)]]</Select>
+    <!--Network Policy Server Discarded Request-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=6275)]]</Select>
+    <!--Network Policy Server Discarded Accounting Request-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=6276)]]</Select>
+    <!--Network Policy Server Quarantined User-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=6277)]]</Select>
+    <!--Network Policy Server Granted Probationary Access-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=6278)]]</Select>
+    <!--Network Policy Server Granted Full Access-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=6279)]]</Select>
+    <!--Network Policy Server Locked Account-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=6280)]]</Select>
+    <!--Network Policy Server Unlocked Account-->
+    <Select Path="Security">*[System[(Level=4 or Level=0) and (EventID=6281)]]</Select>
+    <!--Detected an invalid page hash of an image file-->
+  </Query>
+  <Query Id="4" Path="Microsoft-Windows-Sysmon/Operational">
+    <Select Path="Microsoft-Windows-Sysmon/Operational">*[System[(Level=4 or Level=0) and (EventID=1 or EventID=8 or EventID=25)]]</Select>
+    <!--Special Sysmon Events-->
+  </Query>
+  <Query Id="5" Path="Microsoft-Windows-Windows Defender/Operational">
+    <Select Path="Microsoft-Windows-Windows Defender/Operational">*[System[(Level=1  or Level=2 or Level=3 or Level=4 or Level=0) and (EventID=1116)]]</Select>
+  </Query>
+</QueryList>]]></Query>
+  <ReadExistingEvents>true</ReadExistingEvents>
+  <TransportName>http</TransportName>
+  <ContentFormat>Events</ContentFormat>
+  <Locale Language="en-US"/>
+  <LogFile>WEC-EventInvestigation</LogFile>
+  <AllowedSourceNonDomainComputers/>
+  <AllowedSourceDomainComputers>O:NSG:NSD:(A;;GA;;;S-1-5-21-2724043432-3331961142-2652923708-515)</AllowedSourceDomainComputers>
+</Subscription>
