@@ -73,6 +73,15 @@ enum TrustTypeID {
     TRUST_ATTRIBUTE_CROSS_ORGANIZATION_ENABLE_TGT_DELEGATION = 0x00000800
 }
 
+[Flags()] enum SupportedEncryptionTypes {
+    DES_CBC_CRC = 0x01
+    DES_CBC_MD5 = 0x02 
+    RC4_HMAC = 0x04
+    AES128_CTS_HMAC_SHA1_96 = 0x08
+    AES256_CTS_HMAC_SHA1_96 = 0x10 
+}
+
+
 ## equivalent to https://docs.microsoft.com/en-us/dotnet/api/system.directoryservices.activedirectory.trusttype?view=net-5.0
 enum TrustFlavor {
     TreeRoot = 0
@@ -89,6 +98,7 @@ $gTrustAttributeMap = @{
     "TRUST_PARTNER" = "trustpartner";
     "TRUST_ATTRIBUTES" = "trustAttributes";
     "TRUST_TYPE_ID" = "trustType";
+    "TRUST_SUPPORTED_ENCRYPTION_TYPES" = "msds-supportedencryptiontypes";
 }
 
 #-----------------------------------------------------------[Functions]------------------------------------------------------------
@@ -256,6 +266,26 @@ Function TrustPropertyTrustFlagsStr {
     }
 }
 
+Function TrustPropertySupportedEncryptionType {
+    Param(
+        [Object]
+        $TrustProperties
+    )
+    Process {
+        $sStatus = "Unknown"
+        $sReason = "Unknown"
+        if( $TrustProperties -ne $null ){
+            $trustSupportedEncryptionTypes = $TrustProperties['TRUST_SUPPORTED_ENCRYPTION_TYPES']
+            $supportedEncryptionTypesStatus = GetTrustSupportedEncryptionTypes -SupportedEncryptionTypes $trustSupportedEncryptionTypes
+            $sStatus = $supportedEncryptionTypesStatus.sStatus
+            $sReason = $supportedEncryptionTypesStatus.sReason
+        }
+        $resultObj = CreateStatusResultObject -status $sStatus -reason $sReason
+        return $resultObj
+    }
+}
+
+
 Function PrintTrustRelationship {
     Param(
         [String]
@@ -318,6 +348,14 @@ Function PrintTrustRelationship {
         $trustAttributeFlagsStrOne = TrustPropertyTrustFlagsStr -TrustProperties $trustNodeOnes_Properties
         $trustAttributeFlagsStrTwo = TrustPropertyTrustFlagsStr -TrustProperties $trustNodeTwos_Properties
         $outputTable += [pscustomobject]@{"Attribute" = "TrustFlags:"; "Domain: $trustNodeOne" = "$trustAttributeFlagsStrOne"; "Domain: $trustNodeTwo" = "$trustAttributeFlagsStrTwo"}
+
+        ## Print: Trust Supported Encryption Types
+        $trustSupportedEncryptionTypesStatusOne = TrustPropertySupportedEncryptionType -TrustProperties $trustNodeOnes_Properties
+        $trustSupportedEncryptionTypesStatusTwo = TrustPropertySupportedEncryptionType -TrustProperties $trustNodeTwos_Properties
+        $outputTable += [pscustomobject]@{"Attribute" = "Supported Encryption Types:"; "Domain: $trustNodeOne" = "$($trustSupportedEncryptionTypesStatusOne.sStatus)"; "Domain: $trustNodeTwo" = "$($trustSupportedEncryptionTypesStatusTwo.sStatus)"}
+        if( $IncludeReason ){
+            $outputTable += [pscustomobject]@{"Attribute" = "Supported Encryption Types (Reason):"; "Domain: $trustNodeOne" = "$($trustSupportedEncryptionTypesStatusOne.sReason)"; "Domain: $trustNodeTwo" = "$($trustSupportedEncryptionTypesStatusTwo.sReason)"}
+        }
 
         ## Output as table       
         $outputTable | Format-Table -AutoSize
@@ -407,12 +445,18 @@ Function PrintGraphNotation {
                 ## TrustFlags
                 $trustFlagsStr = TrustPropertyTrustFlagsStr -TrustProperties $trustProperties
 
+                ## Supported Encryption Types
+                $trustSupportedEncryptionTypesStatus = TrustPropertySupportedEncryptionType -TrustProperties $trustProperties
+                if( $trustSupportedEncryptionTypesStatus.sStatus ){ 
+                    $edgeLabel += "SET: $($trustSupportedEncryptionTypesStatus.sStatus)\n"
+                } 
+
                 $directedNodeStr = TrustRelationshipDirectedNodeStr -TrustNode $trustNode -TrustPartner $trustPartner -TrustDirection $trustDirection
                 $graphPrintBody += "`t$($directedNodeStr) [style=dashed, color=grey, label=`"$($edgeLabel)`"] // TrustFlags: $($trustFlagsStr)`n"
             }
         }
         Write-Output "`ndigraph.txt --- START"
-        Write-Output "digraph Trusts {`n`n`tlabel=`"### Legend ###\nFlavor (F):\n-- TreeRoot (TR)\n-- ParentChild (PC)\n-- CrossLink (CL)\n-- External (E)\n-- Forest (F)\n-- Kerberos (KRB)\n-- Unknown (UNKW)\nTransitivity (T):\n-- Enabled (E)\n-- Disabled (D)\nAuthentication Level (AL):\n-- ForestWideAuthentication (FWA)\n-- SelecticeAuthentication (SA)\nSID Filtering (SIDF):\n-- Enabled (E)\n-- Disabled (D)\nTGT Delegation (TGTD):\n-- Enabled (E)\n-- Not Disabled (D)\n-- Unknown (UNKW)`"`n`tlabeljust=l`n`tlabelloc=t`n`n$($graphPrintHead)`n$($graphPrintBody)`n}"
+        Write-Output "digraph Trusts {`n`n`tlabel=`"### Legend ###\nFlavor (F):\n-- TreeRoot (TR)\n-- ParentChild (PC)\n-- CrossLink (CL)\n-- External (E)\n-- Forest (F)\n-- Kerberos (KRB)\n-- Unknown (UNKW)\nTransitivity (T):\n-- Enabled (E)\n-- Disabled (D)\nAuthentication Level (AL):\n-- ForestWideAuthentication (FWA)\n-- SelecticeAuthentication (SA)\nSID Filtering (SIDF):\n-- Enabled (E)\n-- Disabled (D)\nTGT Delegation (TGTD):\n-- Enabled (E)\n-- Not Disabled (D)\n-- Unknown (UNKW)\nSupportedEncryptionTypes (SET)\n`"`n`tlabeljust=l`n`tlabelloc=t`n`n$($graphPrintHead)`n$($graphPrintBody)`n}"
         Write-Output "digraph.txt --- END"
     }
 }
@@ -968,6 +1012,29 @@ Function GetTrustTransitivtyStatus {
     }
 }
 
+Function GetTrustSupportedEncryptionTypes {
+    Param(
+        [Int]
+        $SupportedEncryptionTypes
+    )
+    Begin{
+       $supportedEncryptionTypes = [Int]($SupportedEncryptionTypes)
+    }
+    Process {
+        $supportedEncTypes = ''
+        ForEach( $encryptionType in [SupportedEncryptionTypes].GetEnumValues() ){
+            If( $supportedEncryptionTypes -band $encryptionType.value__ ){
+                $supportedEncTypes += "$($encryptionType) "
+            }
+        }
+        $statusStr = $supportedEncTypes
+        $reasonStr = "msds-supportedEncryptionTypes: '$($supportedEncryptionTypes)'"
+        $resultObj = CreateStatusResultObject -status $statusStr -reason $reasonStr
+        return $resultObj
+    }
+}
+
+
 Function ExtendTrustTree {
     Param(
         [String]
@@ -1028,7 +1095,7 @@ Function GetTrusts {
 
     Process{
         ## Prepare LDAP Query
-        $trustAttributes = @("securityidentifier", "distinguishedname", "instancetype", "adspath", "trustdirection", "trustattributes", "trustpartner", "trusttype")
+        $trustAttributes = @("securityidentifier", "distinguishedname", "instancetype", "adspath", "trustdirection", "trustattributes", "trustpartner", "trusttype", "msds-supportedencryptiontypes")
         $searcher = [adsisearcher]"(objectclass=trustedDomain)"
         $searcher.PropertiesToLoad.AddRange($trustAttributes)
         
@@ -1042,6 +1109,14 @@ Function GetTrusts {
                 Write-Verbose "Trying to fetch trusts from '$($searchRoot)'"
                 $searcher.SearchRoot = $searchRoot
                 $trusts = $searcher.FindAll()
+                ## Some attributes are not propagated to the global catalog, adding those manually here
+                ForEach($trustResultObj in $trusts){
+                    ## Adding: msds-supportedencryptiontypes
+                    If( "msds-supportedencryptiontypes" -Notin $trustResultObj.Properties ){
+                        $msDsSupportedEncTypes = GetADSIAttribute -Domain $Domain -DistinguishedName $trustResultObj.Properties.distinguishedname[0] -Property 'msds-supportedencryptiontypes' -NoGC
+                        $trustResultObj["msds-supportedencryptiontypes"] = $msDsSupportedEncTypes
+                    }
+                }
                 $success = $true
                 break
             }
