@@ -741,6 +741,7 @@ Function GetTrustAuthenticationLevel {
         $statusStr = ""
         $reasonStr = ""
         
+        ## Check if trust is withint forest
         if( $trustAttributes -band [TrustAttributes]::TRUST_ATTRIBUTE_WITHIN_FOREST.value__ ){
             $statusStr = "ForestWideAuthentication"
             $reasonStr = "trustAttribute flag $([TrustAttributes]::TRUST_ATTRIBUTE_WITHIN_FOREST)"
@@ -749,7 +750,12 @@ Function GetTrustAuthenticationLevel {
             $statusStr = "SelectiveAuthentication"
             $reasonStr = "trustAttribute flag $([TrustAttributes]::TRUST_ATTRIBUTE_CROSS_ORGANIZATION)"
         }
-        else { 
+        ## Check if trust is marked as transitive, e.g. being a Forest-Trust
+        elseif( $trustAttributes -band [TrustAttributes]::TRUST_ATTRIBUTE_FOREST_TRANSITIVE ){
+            $statusStr = "ForestWideAuthentication"
+            $reasonStr = "trustAttribute flag $([TrustAttributes]::TRUST_ATTRIBUTE_FOREST_TRANSITIVE)"
+        }
+        else {
             $statusStr = "DomainWideAuthentication"
             $reasonStr = "missing trustAttribute flag $([TrustAttributes]::TRUST_ATTRIBUTE_CROSS_ORGANIZATION)" 
         }
