@@ -253,7 +253,7 @@ def find_and_loot(interface, dp_ip_addr_str):
 
     if (dp_ip_addr_str):
         log(f"  DP: {dp_ip_addr_str}", MSG_TYPE_DEFAULT)
-        tftp_servers = [].append(dp_ip_addr_str)
+        tftp_servers = [dp_ip_addr_str]
     else:
         tftp_servers = find_pxe_boot_servers(interface, client_mac_addr)
         if (tftp_servers):
